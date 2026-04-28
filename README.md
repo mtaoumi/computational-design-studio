@@ -88,6 +88,22 @@ A Master's in architectural computation lives in this gap between formal languag
 
 ---
 
+## Live Demo
+
+🔗 **Interactive Website:** https://mtaoumi.github.io/computational-design-studio/
+
+Explore the parametric generator directly in your browser. Rotate the model, adjust sliders, switch topologies, and export generated forms.
+
+---
+
+## Screenshots
+
+| Twisted Torus | Möbius Ribbon | Helical Lattice |
+| :-: | :-: | :-: |
+| ![Twisted Torus](docs/torus.png) | ![Möbius Ribbon](docs/mobius.png) | ![Helical Lattice](docs/lattice.png) |
+
+---
+
 ## Technical Stack
 
 - **Three.js** `0.161.0` (loaded from unpkg via an ES module `importmap` , no bundler)
