@@ -119,17 +119,6 @@ Then open `http://localhost:8000`.
 
 ---
 
-## Deploy to GitHub Pages
-
-1. Push this repository to GitHub.
-2. Go to **Settings → Pages**.
-3. Set source to **Deploy from a branch**, branch `main`, folder `/ (root)`.
-4. Wait ~30 seconds. The site will be live at `https://<username>.github.io/<repo>/`.
-
-No build action is required , the repo *is* the deployable site.
-
----
-
 ## Project Structure
 
 ```
