@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parametric Forms — Computational Design Studio</title>
+  <meta name="description" content="An interactive 3D parametric form generator exploring computational design through mathematical surfaces." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Import map: load Three.js and addons from CDN, ESM-style, no build tools -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Canvas mount point -->
+  <div id="canvas-container"></div>
+
+  <!-- Top-left: project header -->
+  <header class="header">
+    <div class="header__mark">
+      <span class="header__glyph">◬</span>
+      <span class="header__index">001 / FORM</span>
+    </div>
+    <h1 class="header__title">
+      <span class="header__title-em">Parametric</span> Forms
+    </h1>
+    <p class="header__desc">
+      An interactive study of mathematical surfaces — twisted tori, Möbius topologies, and procedural lattices — generated entirely from parametric equations. Explore how code becomes architecture.
+    </p>
+  </header>
+
+  <!-- Right: control panel -->
+  <aside class="panel" id="panel">
+    <div class="panel__head">
+      <span class="panel__label">Parameters</span>
+      <button class="panel__collapse" id="panel-collapse" aria-label="Collapse panel">—</button>
+    </div>
+
+    <!-- Form selector -->
+    <section class="panel__section">
+      <div class="panel__section-title">Topology</div>
+      <div class="seg" id="form-seg" role="tablist">
+        <button class="seg__btn is-active" data-form="twistedTorus">Torus</button>
+        <button class="seg__btn" data-form="mobius">Möbius</button>
+        <button class="seg__btn" data-form="lattice">Lattice</button>
+      </div>
+    </section>
+
+    <!-- Sliders -->
+    <section class="panel__section">
+      <div class="panel__section-title">Geometry</div>
+
+      <div class="slider" data-key="segments">
+        <div class="slider__row">
+          <label class="slider__label" for="s-segments">Segments</label>
+          <output class="slider__value" id="o-segments">120</output>
+        </div>
+        <input type="range" id="s-segments" min="12" max="400" step="2" value="120" />
+        <div class="slider__hint"><span>sparse</span><span>dense</span></div>
+      </div>
+
+      <div class="slider" data-key="twist">
+        <div class="slider__row">
+          <label class="slider__label" for="s-twist">Twist Angle</label>
+          <output class="slider__value" id="o-twist">2.50π</output>
+        </div>
+        <input type="range" id="s-twist" min="0" max="12.566" step="0.01" value="7.854" />
+        <div class="slider__hint"><span>0</span><span>4π</span></div>
+      </div>
+
+      <div class="slider" data-key="height">
+        <div class="slider__row">
+          <label class="slider__label" for="s-height">Height</label>
+          <output class="slider__value" id="o-height">3.00</output>
+        </div>
+        <input type="range" id="s-height" min="0.5" max="8" step="0.01" value="3" />
+        <div class="slider__hint"><span>flat</span><span>tall</span></div>
+      </div>
+
+      <div class="slider" data-key="radius">
+        <div class="slider__row">
+          <label class="slider__label" for="s-radius">Radius</label>
+          <output class="slider__value" id="o-radius">1.40</output>
+        </div>
+        <input type="range" id="s-radius" min="0.3" max="4" step="0.01" value="1.4" />
+        <div class="slider__hint"><span>tight</span><span>wide</span></div>
+      </div>
+
+      <div class="slider" data-key="deform">
+        <div class="slider__row">
+          <label class="slider__label" for="s-deform">Deformation</label>
+          <output class="slider__value" id="o-deform">0.30</output>
+        </div>
+        <input type="range" id="s-deform" min="0" max="1.5" step="0.01" value="0.3" />
+        <div class="slider__hint"><span>pure</span><span>chaotic</span></div>
+      </div>
+
+      <div class="slider" data-key="density">
+        <div class="slider__row">
+          <label class="slider__label" for="s-density">Wireframe Density</label>
+          <output class="slider__value" id="o-density">40</output>
+        </div>
+        <input type="range" id="s-density" min="6" max="100" step="1" value="40" />
+        <div class="slider__hint"><span>coarse</span><span>fine</span></div>
+      </div>
+    </section>
+
+    <!-- Render mode -->
+    <section class="panel__section">
+      <div class="panel__section-title">Render Mode</div>
+      <div class="seg" id="mode-seg">
+        <button class="seg__btn is-active" data-mode="wireframe">Wireframe</button>
+        <button class="seg__btn" data-mode="solid">Solid</button>
+        <button class="seg__btn" data-mode="xray">X-Ray</button>
+      </div>
+    </section>
+
+    <!-- Presets -->
+    <section class="panel__section">
+      <div class="panel__section-title">Presets</div>
+      <div class="presets">
+        <button class="preset" data-preset="tower">
+          <span class="preset__num">01</span>
+          <span class="preset__name">Tower</span>
+          <span class="preset__sub">vertical helix</span>
+        </button>
+        <button class="preset" data-preset="lattice">
+          <span class="preset__num">02</span>
+          <span class="preset__name">Lattice</span>
+          <span class="preset__sub">structural mesh</span>
+        </button>
+        <button class="preset" data-preset="twist">
+          <span class="preset__num">03</span>
+          <span class="preset__name">Twist</span>
+          <span class="preset__sub">tight torsion</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="panel__section panel__section--actions">
+      <div class="checkbox">
+        <input type="checkbox" id="auto-rotate" checked />
+        <label for="auto-rotate">
+          <span class="checkbox__box"></span>
+          <span class="checkbox__text">Auto-rotate</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn--ghost" id="btn-randomize">
+          <span>Randomise</span>
+          <span class="btn__icon">⚄</span>
+        </button>
+        <button class="btn btn--ghost" id="btn-reset">
+          <span>Reset</span>
+          <span class="btn__icon">↺</span>
+        </button>
+        <button class="btn btn--accent" id="btn-export-obj">
+          <span>Export .OBJ</span>
+          <span class="btn__icon">↓</span>
+        </button>
+        <button class="btn btn--ghost btn--small" id="btn-export-stl">
+          <span>.STL</span>
+        </button>
+      </div>
+    </section>
+  </aside>
+
+  <!-- Bottom info bar -->
+  <footer class="statbar">
+    <div class="statbar__group">
+      <span class="statbar__label">FORM</span>
+      <span class="statbar__value" id="stat-form">Twisted Torus</span>
+    </div>
+    <div class="statbar__divider"></div>
+    <div class="statbar__group">
+      <span class="statbar__label">VERTICES</span>
+      <span class="statbar__value" id="stat-verts">—</span>
+    </div>
+    <div class="statbar__divider"></div>
+    <div class="statbar__group">
+      <span class="statbar__label">FACES</span>
+      <span class="statbar__value" id="stat-faces">—</span>
+    </div>
+    <div class="statbar__divider"></div>
+    <div class="statbar__group">
+      <span class="statbar__label">FPS</span>
+      <span class="statbar__value" id="stat-fps">—</span>
+    </div>
+    <div class="statbar__spacer"></div>
+    <div class="statbar__group statbar__group--right">
+      <span class="statbar__label">v1.0 — IFRANE / 2026</span>
+    </div>
+  </footer>
+
+  <!-- Mobile lock -->
+  <div class="mobile-lock" id="mobile-lock">
+    <div class="mobile-lock__inner">
+      <div class="mobile-lock__glyph">◬</div>
+      <h2>Rotate to Landscape</h2>
+      <p>This computational study requires a wider canvas. Please rotate your device, or open on a tablet or desktop for the full experience.</p>
+      <div class="mobile-lock__icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="48" height="48">
+          <rect x="14" y="6" width="36" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="32" cy="52" r="1.5" fill="currentColor"/>
+          <path d="M 56 28 Q 60 32 56 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading splash -->
+  <div class="splash" id="splash">
+    <div class="splash__inner">
+      <div class="splash__glyph">◬</div>
+      <div class="splash__text">Computing geometry…</div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
